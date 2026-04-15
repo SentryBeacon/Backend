@@ -1,0 +1,270 @@
+<svg width="800" height="200" viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .road { fill: #21262d; }
+    .sky  { fill: #0d1117; }
+    .ground { fill: #161b22; }
+    .lane-line { stroke: #444c56; stroke-width: 1; stroke-dasharray: 18 12; fill: none; }
+    .lane-edge { stroke: #e6f1fb; stroke-width: 1.5; fill: none; }
+    .cam-post  { stroke: #444c56; stroke-width: 3; fill: none; }
+    .cam-box   { fill: #30363d; }
+    .cam-lens  { fill: #378ADD; }
+    .cam-label { fill: #EF9F27; font-family: monospace; font-size: 9px; }
+    .beam      { fill: #378ADD; opacity: 0.07; }
+    .title     { fill: #e6f1fb; font-family: monospace; font-size: 22px; font-weight: 700; letter-spacing: 2px; }
+    .sub       { fill: #8b949e; font-family: monospace; font-size: 11px; }
+    .badge-bg  { fill: none; stroke: #378ADD; stroke-width: 1; rx: 4; }
+    .badge-txt { fill: #378ADD; font-family: monospace; font-size: 9px; }
+    .plate-bg  { fill: #fffbe6; }
+    .plate-br  { fill: none; stroke: #EF9F27; stroke-width: 1; }
+    .plate-txt { fill: #1c2128; font-family: monospace; font-size: 7px; text-anchor: middle; }
+    .bbox      { fill: none; stroke: #1D9E75; stroke-width: 1.5; stroke-dasharray: 4 3; }
+    .bbox-alert{ fill: none; stroke: #E24B4A; stroke-width: 1.5; stroke-dasharray: 4 3; }
+    .scan-line { stroke: #378ADD; stroke-width: 1.5; opacity: 0.8; }
+    .vtype     { fill: #1D9E75; font-family: monospace; font-size: 8px; }
+    .pulse-ring { fill: none; stroke: #1D9E75; stroke-width: 1; }
+
+    /* CAR 1 - blue car, lane1, left→right */
+    .car1-body { fill: #2563EB; }
+    .car1-roof { fill: #1D4ED8; }
+    .car1-win  { fill: rgba(147,210,255,0.5); }
+    .car1-whl  { fill: #e6f1fb; }
+    .car1-hdl  { fill: #EF9F27; }
+    .car1-plate{ }
+
+    /* CAR 2 - red car, lane2, left→right */
+    .car2-body { fill: #DC2626; }
+    .car2-roof { fill: #B91C1C; }
+
+    /* TRUCK - lane1, left→right */
+    .trk-body  { fill: #374151; }
+    .trk-roof  { fill: #1F2937; }
+
+    /* MOTO - lane3, right→left */
+    .moto-body { fill: #16A34A; }
+    .moto-seat { fill: #15803D; }
+
+    /* CAR3 - lane4 right→left */
+    .car3-body { fill: #7C3AED; }
+    .car3-roof { fill: #6D28D9; }
+
+    /* ANIMATIONS */
+
+    /* car1: x starts -50, ends 850, dur 6s */
+    @keyframes car1-move { from { transform: translateX(-50px); } to { transform: translateX(850px); } }
+    .car1-g { animation: car1-move 6s linear infinite; }
+
+    /* car2: offset 2s */
+    @keyframes car2-move { from { transform: translateX(-50px); } to { transform: translateX(850px); } }
+    .car2-g { animation: car2-move 7s linear infinite; animation-delay: -2s; }
+
+    /* truck: slower */
+    @keyframes trk-move { from { transform: translateX(-80px); } to { transform: translateX(880px); } }
+    .trk-g { animation: trk-move 9s linear infinite; animation-delay: -4s; }
+
+    /* moto: right to left */
+    @keyframes moto-move { from { transform: translateX(860px); } to { transform: translateX(-60px); } }
+    .moto-g { animation: moto-move 5s linear infinite; animation-delay: -1s; }
+
+    /* car3: right to left */
+    @keyframes car3-move { from { transform: translateX(860px); } to { transform: translateX(-60px); } }
+    .car3-g { animation: car3-move 6.5s linear infinite; animation-delay: -3s; }
+
+    /* scan line bounce */
+    @keyframes scan { 0%{opacity:0.9;transform:translateY(0)} 50%{opacity:0.3;transform:translateY(32px)} 100%{opacity:0.9;transform:translateY(0)} }
+    .scan-anim { animation: scan 1s ease-in-out infinite; }
+
+    /* bbox fade + pulse */
+    @keyframes bbox-pulse { 0%,100%{opacity:0.9} 50%{opacity:0.4} }
+    .bbox-anim { animation: bbox-pulse 1.2s ease-in-out infinite; }
+
+    /* plate pop */
+    @keyframes plate-pop { 0%{opacity:0} 60%{opacity:0} 80%{opacity:1} 100%{opacity:1} }
+    .plate-anim { animation: plate-pop 6s linear infinite; }
+    .plate-anim2 { animation: plate-pop 7s linear infinite; animation-delay: -2s; }
+    .plate-moto  { animation: plate-pop 5s linear infinite; animation-delay: -1s; }
+
+    /* cam blink */
+    @keyframes cam-blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .cam-blink { animation: cam-blink 1.2s infinite; }
+
+    /* beam flicker */
+    @keyframes beam-flicker { 0%,100%{opacity:0.08} 50%{opacity:0.04} }
+    .beam-anim { animation: beam-flicker 2s ease-in-out infinite; }
+
+    /* building window flicker */
+    @keyframes win1 { 0%,100%{opacity:1} 47%{opacity:1} 50%{opacity:0.1} 53%{opacity:1} }
+    @keyframes win2 { 0%,100%{opacity:0.2} 30%{opacity:0.2} 33%{opacity:1} 70%{opacity:1} 73%{opacity:0.2} }
+    .win1 { animation: win1 4s infinite; }
+    .win2 { animation: win2 6s infinite; animation-delay: -2s; }
+
+    /* title glow pulse */
+    @keyframes title-pulse { 0%,100%{opacity:1} 50%{opacity:0.85} }
+    .title-anim { animation: title-pulse 3s ease-in-out infinite; }
+
+    /* live dot */
+    @keyframes live { 0%,100%{opacity:1} 50%{opacity:0.15} }
+    .live-dot { animation: live 1s infinite; }
+  </style>
+
+  <!-- Sky / ground -->
+  <rect class="sky" x="0" y="0" width="800" height="200"/>
+
+  <!-- Buildings silhouette -->
+  <g opacity="0.7">
+    <rect fill="#1c2128" x="10" y="30" width="45" height="70"/>
+    <rect fill="#1c2128" x="62" y="45" width="35" height="55"/>
+    <rect fill="#1c2128" x="104" y="20" width="55" height="80"/>
+    <rect fill="#1c2128" x="166" y="38" width="40" height="62"/>
+    <rect fill="#1c2128" x="213" y="10" width="60" height="90"/>
+    <rect fill="#1c2128" x="560" y="25" width="50" height="75"/>
+    <rect fill="#1c2128" x="617" y="40" width="38" height="60"/>
+    <rect fill="#1c2128" x="662" y="15" width="65" height="85"/>
+    <rect fill="#1c2128" x="734" y="35" width="42" height="65"/>
+
+    <!-- Window lights -->
+    <rect class="win1" fill="#EF9F27" x="18" y="38" width="5" height="4"/>
+    <rect class="win2" fill="#EF9F27" x="28" y="38" width="5" height="4"/>
+    <rect class="win1" fill="#EF9F27" x="18" y="48" width="5" height="4"/>
+    <rect class="win2" fill="#EF9F27" x="38" y="55" width="5" height="4"/>
+    <rect class="win1" fill="#EF9F27" x="112" y="28" width="5" height="4"/>
+    <rect class="win2" fill="#EF9F27" x="124" y="28" width="5" height="4"/>
+    <rect class="win1" fill="#EF9F27" x="112" y="40" width="5" height="4"/>
+    <rect class="win1" fill="#EF9F27" x="221" y="20" width="5" height="4"/>
+    <rect class="win2" fill="#EF9F27" x="234" y="20" width="5" height="4"/>
+    <rect class="win1" fill="#EF9F27" x="246" y="32" width="5" height="4"/>
+    <rect class="win2" fill="#EF9F27" x="568" y="33" width="5" height="4"/>
+    <rect class="win1" fill="#EF9F27" x="580" y="33" width="5" height="4"/>
+    <rect class="win2" fill="#EF9F27" x="670" y="23" width="5" height="4"/>
+    <rect class="win1" fill="#EF9F27" x="683" y="23" width="5" height="4"/>
+    <rect class="win2" fill="#EF9F27" x="670" y="36" width="5" height="4"/>
+    <rect class="win1" fill="#EF9F27" x="742" y="43" width="5" height="4"/>
+    <rect class="win2" fill="#EF9F27" x="754" y="43" width="5" height="4"/>
+  </g>
+
+  <!-- Road -->
+  <rect class="road" x="0" y="100" width="800" height="100"/>
+
+  <!-- Lane dividers -->
+  <line class="lane-edge" x1="0" y1="103" x2="800" y2="103"/>
+  <line class="lane-line" x1="0" y1="127" x2="800" y2="127"/>
+  <line x1="0" y1="150" x2="800" y2="150" stroke="#30363d" stroke-width="1" fill="none"/>
+  <line class="lane-line" x1="0" y1="173" x2="800" y2="173"/>
+  <line class="lane-edge" x1="0" y1="197" x2="800" y2="197"/>
+
+  <!-- Camera post at x=500 -->
+  <line class="cam-post" x1="500" y1="100" x2="500" y2="20"/>
+  <line class="cam-post" x1="500" y1="20" x2="540" y2="20"/>
+  <rect class="cam-box" x="530" y="14" width="26" height="14" rx="3"/>
+  <rect fill="#0d1117" x="532" y="16" width="22" height="10" rx="2"/>
+  <circle class="cam-lens cam-blink" cx="543" cy="21" r="3.5"/>
+  <text class="cam-label" x="528" y="10">AI CAM</text>
+
+  <!-- Scan beam from camera -->
+  <polygon class="beam beam-anim" points="548,21 370,200 580,200"/>
+  <line x1="548" y1="21" x2="370" y2="200" stroke="#378ADD" stroke-width="0.8" stroke-opacity="0.2" fill="none"/>
+
+  <!-- VEHICLES -->
+
+  <!-- CAR 1 (blue) lane1, y≈108 -->
+  <g class="car1-g">
+    <rect class="car1-body" x="0" y="116" width="44" height="14" rx="3"/>
+    <rect class="car1-roof" x="6" y="108" width="28" height="10" rx="3 3 0 0"/>
+    <rect class="car1-win" x="8" y="110" width="10" height="7"/>
+    <rect class="car1-win" x="21" y="110" width="8" height="7"/>
+    <circle class="car1-whl" cx="41" cy="130" r="4"/>
+    <circle class="car1-whl" cx="41" cy="119" r="4"/>
+    <circle class="car1-hdl" cx="3" cy="130" r="3.5"/>
+    <circle class="car1-hdl" cx="3" cy="119" r="3.5"/>
+    <!-- bbox -->
+    <rect class="bbox bbox-anim" x="-3" y="105" width="50" height="28" rx="2"/>
+    <!-- scan line -->
+    <line class="scan-line scan-anim" x1="-3" y1="119" x2="47" y2="119"/>
+    <!-- label -->
+    <text class="vtype" x="-3" y="102">CAR</text>
+    <!-- plate -->
+    <g class="plate-anim">
+      <rect class="plate-bg" x="2" y="131" width="40" height="11" rx="2"/>
+      <rect class="plate-br" x="2" y="131" width="40" height="11" rx="2"/>
+      <text class="plate-txt" x="22" y="139">51A-123.45</text>
+    </g>
+  </g>
+
+  <!-- CAR 2 (red) lane2, y≈133 -->
+  <g class="car2-g">
+    <rect class="car2-body" x="0" y="141" width="44" height="14" rx="3"/>
+    <rect class="car2-roof" x="6" y="133" width="28" height="10" rx="3 3 0 0"/>
+    <rect fill="rgba(147,210,255,0.45)" x="8" y="135" width="10" height="7"/>
+    <rect fill="rgba(147,210,255,0.45)" x="21" y="135" width="8" height="7"/>
+    <circle fill="#e6f1fb" cx="41" cy="155" r="4"/>
+    <circle fill="#e6f1fb" cx="41" cy="144" r="4"/>
+    <circle fill="#EF9F27" cx="3" cy="155" r="3.5"/>
+    <circle fill="#EF9F27" cx="3" cy="144" r="3.5"/>
+    <rect class="bbox bbox-anim" x="-3" y="130" width="50" height="28" rx="2"/>
+    <line class="scan-line scan-anim" x1="-3" y1="144" x2="47" y2="144" style="animation-delay:-0.4s"/>
+    <text class="vtype" x="-3" y="127">CAR</text>
+    <g class="plate-anim2">
+      <rect class="plate-bg" x="2" y="156" width="40" height="11" rx="2"/>
+      <rect class="plate-br" x="2" y="156" width="40" height="11" rx="2"/>
+      <text class="plate-txt" x="22" y="164">29B-456.78</text>
+    </g>
+  </g>
+
+  <!-- TRUCK lane1, y≈108 (offset) -->
+  <g class="trk-g">
+    <rect class="trk-body" x="0" y="114" width="58" height="16" rx="3"/>
+    <rect class="trk-roof" x="4" y="106" width="28" height="10"/>
+    <rect fill="rgba(147,210,255,0.35)" x="32" y="108" width="20" height="12"/>
+    <circle fill="#e6f1fb" cx="54" cy="130" r="5"/>
+    <circle fill="#e6f1fb" cx="54" cy="117" r="5"/>
+    <circle fill="#EF9F27" cx="3" cy="130" r="4.5"/>
+    <circle fill="#EF9F27" cx="3" cy="117" r="4.5"/>
+    <rect class="bbox bbox-anim" x="-3" y="103" width="64" height="30" rx="2"/>
+    <line class="scan-line scan-anim" x1="-3" y1="118" x2="61" y2="118" style="animation-delay:-0.7s"/>
+    <text class="vtype" x="-3" y="100">TRUCK</text>
+    <g class="plate-anim">
+      <rect class="plate-bg" x="3" y="133" width="52" height="11" rx="2"/>
+      <rect class="plate-br" x="3" y="133" width="52" height="11" rx="2"/>
+      <text class="plate-txt" x="29" y="141">43C-789.01</text>
+    </g>
+  </g>
+
+  <!-- MOTO lane3, right→left, y≈162, flip -->
+  <g class="moto-g" transform="scale(-1,1) translate(-800,0)">
+    <!-- mirror so moto faces left travel direction -->
+    <ellipse class="moto-body" cx="14" cy="171" rx="14" ry="5"/>
+    <rect class="moto-seat" x="6" y="162" width="16" height="10" rx="3"/>
+    <circle fill="#e6f1fb" cx="26" cy="168" r="3"/>
+    <circle fill="#EF9F27" cx="2" cy="168" r="2.5"/>
+    <rect class="bbox bbox-anim" x="-3" y="159" width="34" height="16" rx="2"/>
+    <line class="scan-line scan-anim" x1="-3" y1="167" x2="31" y2="167" style="animation-delay:-0.2s"/>
+    <text class="vtype" x="-3" y="156">MOTO</text>
+    <g class="plate-moto">
+      <rect class="plate-bg" x="-1" y="175" width="30" height="9" rx="2"/>
+      <rect class="plate-br" x="-1" y="175" width="30" height="9" rx="2"/>
+      <text class="plate-txt" x="14" y="182">92H-654</text>
+    </g>
+  </g>
+
+  <!-- CAR3 (purple) lane4, right→left, flip -->
+  <g class="car3-g" transform="scale(-1,1) translate(-800,0)">
+    <rect class="car3-body" x="0" y="180" width="44" height="14" rx="3"/>
+    <rect class="car3-roof" x="10" y="172" width="28" height="10" rx="3 3 0 0"/>
+    <rect fill="rgba(147,210,255,0.45)" x="12" y="174" width="10" height="7"/>
+    <rect fill="rgba(147,210,255,0.45)" x="25" y="174" width="8" height="7"/>
+    <circle fill="#e6f1fb" cx="41" cy="194" r="4"/>
+    <circle fill="#e6f1fb" cx="41" cy="183" r="4"/>
+    <circle fill="#EF9F27" cx="3" cy="194" r="3.5"/>
+    <circle fill="#EF9F27" cx="3" cy="183" r="3.5"/>
+    <rect class="bbox-alert bbox-anim" x="-3" y="169" width="50" height="28" rx="2"/>
+    <line class="scan-line scan-anim" x1="-3" y1="183" x2="47" y2="183" style="animation-delay:-0.9s;stroke:#E24B4A"/>
+    <text x="-3" y="166" fill="#E24B4A" font-family="monospace" font-size="8px">CAR !</text>
+    <g class="plate-anim2">
+      <rect class="plate-bg" x="2" y="195" width="40" height="11" rx="2"/>
+      <rect fill="none" stroke="#E24B4A" stroke-width="1" x="2" y="195" width="40" height="11" rx="2"/>
+      <text class="plate-txt" x="22" y="203">30E-321.65</text>
+    </g>
+  </g>
+
+
+
+</svg>
