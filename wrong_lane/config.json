@@ -1,0 +1,35 @@
+{
+  "zone_polygon": [
+    [
+      208,
+      1027
+    ],
+    [
+      753,
+      1041
+    ],
+    [
+      806,
+      493
+    ],
+    [
+      346,
+      468
+    ],
+    [
+      27,
+      994
+    ]
+  ],
+  "vline_a": [
+    609,
+    222
+  ],
+  "vline_b": [
+    1130,
+    277
+  ],
+  "enter_confirm_frames": 1,
+  "violation_confirm_frames": 1,
+  "cooldown_frames": 60
+}
