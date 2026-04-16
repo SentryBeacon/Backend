@@ -17,13 +17,10 @@ import time
 from datetime import datetime
 from collections import defaultdict
 
-<<<<<<< HEAD
-=======
 
 # ─────────────────────────────────────────────────────────
 #  CONFIG
 # ─────────────────────────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 ZONE_POLYGON = [
     (80, 1060), (400, 1060),
     (370,  380), (60,   380),
@@ -31,64 +28,33 @@ ZONE_POLYGON = [
 VLINE_A = (60,  370)
 VLINE_B = (420, 370)
 
-<<<<<<< HEAD
 ENTER_CONFIRM_FRAMES     = 1
 
 VIOLATION_CONFIRM_FRAMES = 1
 COOLDOWN_FRAMES          = 60
 
-=======
-# [P1-FIX] Giam xuong 1: phat hien xe vao lan ngay lap tuc
-ENTER_CONFIRM_FRAMES     = 1
-# [P4-FIX] Giam xuong 1: cat vach 1 lan = vi pham
-VIOLATION_CONFIRM_FRAMES = 1
-COOLDOWN_FRAMES          = 60
-# [P1-FIX] So frame giu ghost khi mat bbox (tranh nhap nhay)
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 GHOST_FRAMES             = 8
 LOST_TTL                 = 30
 
 VIDEO_PATH  = "video.mp4"
 OUTPUT_DIR  = "violations"
-<<<<<<< HEAD
 CONFIG_FILE = "config.json"
 
 YOLO_MODEL  = "yolov8m.pt"
 
-=======
-CONFIG_FILE = "config_v6.json"
-
-YOLO_MODEL  = "yolov8m.pt"
-# COCO vehicle class IDs: bicycle=1, car=2, motorcycle=3, bus=5, truck=7
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 VEHICLE_CLASSES = {1, 2, 3, 5, 7}
 CONF_THRESH     = 0.25
 IOU_THRESH      = 0.45
 
-<<<<<<< HEAD
-=======
 # [P2-FIX] Giam xuong 960 de chay on dinh moi frame, tang len 1280 neu GPU manh
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 INFER_W = 960
 
 DRAG_THRESH = 16
 
-<<<<<<< HEAD
 SORT_MAX_AGE   = LOST_TTL
 SORT_MIN_HITS  = 1
 SORT_IOU_THRESH = 0.25
 
-=======
-# SORT tracker params
-SORT_MAX_AGE   = LOST_TTL   # so frame giu track khi mat det
-SORT_MIN_HITS  = 1          # so frame co det truoc khi hien track
-SORT_IOU_THRESH = 0.25      # IoU de match track voi det
-
-
-# ─────────────────────────────────────────────────────────
-#  SORT TRACKER (tu tich hop, khong phu thuoc supervision)
-# ─────────────────────────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 def _iou_batch(bb_test, bb_gt):
     """Tinh IoU giua mang det va mang track. Shape: (N,4) vs (M,4)."""
     bb_gt = np.expand_dims(bb_gt, 0)
@@ -104,10 +70,7 @@ def _iou_batch(bb_test, bb_gt):
     a2 = (bb_gt[..., 2]-bb_gt[..., 0])*(bb_gt[..., 3]-bb_gt[..., 1])
     return inter / (a1 + a2 - inter + 1e-9)
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 def _linear_assignment(cost_matrix):
     """Hungarian algorithm don gian (scipy-free)."""
     try:
@@ -115,11 +78,7 @@ def _linear_assignment(cost_matrix):
         r, c = linear_sum_assignment(cost_matrix)
         return np.stack([r, c], axis=1)
     except ImportError:
-<<<<<<< HEAD
-
-=======
         # Fallback greedy
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         n, m = cost_matrix.shape
         assigned = []
         used_r, used_c = set(), set()
@@ -131,20 +90,13 @@ def _linear_assignment(cost_matrix):
                 used_r.add(r); used_c.add(c)
         return np.array(assigned, dtype=int) if assigned else np.empty((0, 2), int)
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 class _KalmanBoxTracker:
     """Kalman filter theo doi 1 bbox [x1,y1,x2,y2]."""
     count = 0
 
     def __init__(self, bbox):
-<<<<<<< HEAD
-
-=======
         # State: [cx, cy, s, r, dcx, dcy, ds]  (s=area, r=aspect)
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         self.kf = cv2.KalmanFilter(7, 4)
         self.kf.measurementMatrix = np.array([
             [1,0,0,0,0,0,0],
@@ -212,10 +164,7 @@ class _KalmanBoxTracker:
     def get_state(self):
         return self._z_to_bbox(self.kf.statePost)
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 class SORTTracker:
     """SORT: Simple Online and Realtime Tracking."""
 
@@ -234,10 +183,7 @@ class SORTTracker:
         """
         self.frame_count += 1
 
-<<<<<<< HEAD
-=======
         # Predict vi tri moi cho tat ca tracker hien co
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         predicted = []
         to_del = []
         for t, trk in enumerate(self.trackers):
@@ -262,18 +208,12 @@ class SORTTracker:
                     matched_t.add(t_idx)
                     matched_d.add(d_idx)
 
-<<<<<<< HEAD
-=======
         # Tao tracker moi cho det chua duoc match
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         for d_idx, det in enumerate(dets):
             if d_idx not in matched_d:
                 self.trackers.append(_KalmanBoxTracker(det[:4]))
 
-<<<<<<< HEAD
-=======
         # Thu thap ket qua, xoa tracker qua han
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         ret = []
         keep = []
         for trk in self.trackers:
@@ -285,23 +225,16 @@ class SORTTracker:
         self.trackers = keep
         return np.array(ret) if ret else np.empty((0, 5))
 
-<<<<<<< HEAD
-=======
 
 # ─────────────────────────────────────────────────────────
 #  ANALYZER
 # ─────────────────────────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 class Analyzer:
     S_UNSEEN   = 0
     S_ENTERING = 1
     S_TRACKING = 2
     S_VIOLATED = 3
-<<<<<<< HEAD
     S_GHOST    = 4
-=======
-    S_GHOST    = 4   # [P1-FIX] Trang thai giu hien thi khi mat bbox tam thoi
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 
     def __init__(self, polygon_pts, pa, pb,
                  enter_confirm=ENTER_CONFIRM_FRAMES,
@@ -322,18 +255,10 @@ class Analyzer:
         self.enter_cnt  = defaultdict(int)
         self.vio_cnt    = defaultdict(int)
         self.cd_cnt     = defaultdict(int)
-<<<<<<< HEAD
         self.ghost_cnt  = defaultdict(int)
         self.prev_pt    = {}
         self.last_bbox  = {}
 
-=======
-        self.ghost_cnt  = defaultdict(int)   # dem frame ghost
-        self.prev_pt    = {}                 # bottom-center frame truoc
-        self.last_bbox  = {}                 # bbox cuoi cung de ve khi ghost
-
-    # ── Zone detection ────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
     def _in_zone(self, bbox):
         """
         [P3-FIX] Uu tien kiem tra phan DUOI xe (banh xe).
@@ -343,7 +268,6 @@ class Analyzer:
         """
         x1, y1, x2, y2 = [int(v) for v in bbox]
         cx   = (x1 + x2) // 2
-<<<<<<< HEAD
 
         bot  = y2
         mid  = (y1 + y2) // 2
@@ -359,41 +283,17 @@ class Analyzer:
             (x1,  qbot),
             (x2,  qbot),
             (cx,  mid),
-=======
-        # Nua duoi cua bbox (phan banh xe – quan trong nhat)
-        bot  = y2
-        mid  = (y1 + y2) // 2
-        qbot = (mid + y2) // 2   # quarter phia duoi
-
-        # Tang 1: 9 diem uu tien phan duoi xe
-        pts1 = [
-            (cx,  bot),           # bottom-center  ← quan trong nhat
-            (x1,  bot),           # bottom-left
-            (x2,  bot),           # bottom-right
-            ((x1+cx)//2, bot),    # bottom q-left
-            ((cx+x2)//2, bot),    # bottom q-right
-            (cx,  qbot),          # sub-bottom center
-            (x1,  qbot),          # sub-bottom left
-            (x2,  qbot),          # sub-bottom right
-            (cx,  mid),           # mid-center
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         ]
         for px, py in pts1:
             if cv2.pointPolygonTest(self.poly_np, (float(px), float(py)), False) >= 0:
                 return True
 
-<<<<<<< HEAD
-=======
         # Tang 2: dinh polygon nam trong bbox?
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         for vx, vy in self.poly_np:
             if x1 <= vx <= x2 and y1 <= vy <= y2:
                 return True
 
-<<<<<<< HEAD
-=======
         # Tang 3: grid 3x3 nua duoi bbox
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         step_x = max((x2 - x1) // 2, 1)
         step_y = max((y2 - mid) // 2, 1)
         for gx in range(x1, x2 + 1, step_x):
@@ -402,10 +302,7 @@ class Analyzer:
                     return True
         return False
 
-<<<<<<< HEAD
-=======
     # ── Vach crossing ─────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
     @staticmethod
     def _cross2d(ox, oy, ux, uy, vx, vy):
         return (ux - ox) * (vy - oy) - (uy - oy) * (vx - ox)
@@ -446,25 +343,14 @@ class Analyzer:
         if prev is None or prev_bbox is None:
             return False
 
-<<<<<<< HEAD
-=======
         # Tranh false positive khi xe dung yen
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         dist = abs(cy - prev[1]) + abs(cx - prev[0])
         if dist < 1.0:
             return False
 
-<<<<<<< HEAD
         if self._seg_intersects(prev[0], prev[1], cx, cy):
             return True
 
-=======
-        # 1. Bottom-center
-        if self._seg_intersects(prev[0], prev[1], cx, cy):
-            return True
-
-        # 2. Mid-center (giua xe)
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         x1, y1, x2, y2 = [int(v) for v in bbox]
         px1, py1, px2, py2 = [int(v) for v in prev_bbox]
         mx_cur  = (x1+x2)/2.;  my_cur  = (y1+y2)/2.
@@ -472,22 +358,11 @@ class Analyzer:
         if self._seg_intersects(mx_prev, my_prev, mx_cur, my_cur):
             return True
 
-<<<<<<< HEAD
         for (cpx, cpy), (ccx, ccy) in [
             ((px1, py1), (x1, y1)),
             ((px2, py1), (x2, y1)),
             ((px1, py2), (x1, y2)),
             ((px2, py2), (x2, y2)),
-=======
-        # 3. Canh tren va duoi bbox (kiem tra xe di qua vach ngang)
-        # Canh duoi: (x1,y2)→(x2,y2) hien tai vs (px1,py2)→(px2,py2) truoc
-        # Thay vi kiem tra canh vs vach (phuc tap), kiem tra 4 goc cat vach:
-        for (cpx, cpy), (ccx, ccy) in [
-            ((px1, py1), (x1, y1)),   # goc tren-trai
-            ((px2, py1), (x2, y1)),   # goc tren-phai
-            ((px1, py2), (x1, y2)),   # goc duoi-trai
-            ((px2, py2), (x2, y2)),   # goc duoi-phai
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         ]:
             if self._seg_intersects(float(cpx), float(cpy),
                                     float(ccx), float(ccy)):
@@ -495,10 +370,7 @@ class Analyzer:
 
         return False
 
-<<<<<<< HEAD
-=======
     # ── State machine ─────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
     def update(self, tid, bbox):
         """
         Tra ve ('tracking'|'violation'|'ghost'|None, bbox_to_draw).
@@ -510,20 +382,11 @@ class Analyzer:
 
         x1, y1, x2, y2 = [int(v) for v in bbox]
         cx_cur = (x1 + x2) / 2.
-<<<<<<< HEAD
         cy_cur = float(y2)
         prev      = self.prev_pt.get(tid)
         prev_bbox = self.last_bbox.get(tid)
         self.prev_pt[tid] = (cx_cur, cy_cur)
 
-=======
-        cy_cur = float(y2)           # bottom-center
-        prev      = self.prev_pt.get(tid)
-        prev_bbox = self.last_bbox.get(tid)  # same as current this frame; set below
-        self.prev_pt[tid] = (cx_cur, cy_cur)
-
-        # --- Cooldown ---
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         if self.cd_cnt[tid] > 0:
             self.cd_cnt[tid] -= 1
             if self.cd_cnt[tid] == 0:
@@ -534,10 +397,7 @@ class Analyzer:
 
         inside = self._in_zone(bbox)
 
-<<<<<<< HEAD
-=======
         # --- UNSEEN ---
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         if self.state[tid] == self.S_UNSEEN:
             if inside:
                 self.state[tid]    = self.S_ENTERING
@@ -547,10 +407,7 @@ class Analyzer:
                 return 'tracking', bbox
             return None, None
 
-<<<<<<< HEAD
-=======
         # --- ENTERING ---
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         if self.state[tid] == self.S_ENTERING:
             if inside:
                 self.enter_cnt[tid] += 1
@@ -563,10 +420,7 @@ class Analyzer:
                     return None, None
             return 'tracking', bbox
 
-<<<<<<< HEAD
-=======
         # --- TRACKING ---
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         if self.state[tid] == self.S_TRACKING:
             if self._crosses_vline(bbox, prev_bbox, cx_cur, cy_cur, prev):
                 self.vio_cnt[tid] += 1
@@ -577,10 +431,7 @@ class Analyzer:
                     return 'violation', bbox
             return 'tracking', bbox
 
-<<<<<<< HEAD
-=======
         # --- VIOLATED (trong cooldown, xu ly o tren) ---
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         if self.state[tid] == self.S_VIOLATED:
             self.state[tid]     = self.S_UNSEEN
             self.enter_cnt[tid] = 0
@@ -590,15 +441,11 @@ class Analyzer:
         return None, None
 
     def ghost_update(self, tid):
-<<<<<<< HEAD
-
-=======
         """
         [P1-FIX] Goi khi tracker mat tid nay (YOLO bo sot 1 frame).
         Giu hien thi them GHOST_FRAMES frame truoc khi xoa.
         Tra ve ('ghost', last_bbox) hoac (None, None) khi het ghost.
         """
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         tid = int(tid)
         if self.state[tid] not in (self.S_TRACKING, self.S_ENTERING,
                                    self.S_VIOLATED, self.S_GHOST):
@@ -615,21 +462,14 @@ class Analyzer:
         active = {int(i) for i in active_ids}
         for tid in list(self.state.keys()):
             if tid not in active and self.state[tid] != self.S_GHOST:
-<<<<<<< HEAD
-
-=======
                 # Chuyen sang ghost thay vi xoa ngay
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
                 if self.state[tid] in (self.S_TRACKING, self.S_ENTERING):
                     self.state[tid] = self.S_GHOST
                     self.ghost_cnt[tid] = 0
                 elif self.state[tid] == self.S_UNSEEN:
                     self._erase(tid)
 
-<<<<<<< HEAD
-=======
         # Gia tang ghost_cnt cho cac ID dang ghost nhung khong con active
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         for tid in list(self.state.keys()):
             if tid not in active and self.state[tid] == self.S_GHOST:
                 self.ghost_cnt[tid] += 1
@@ -644,13 +484,10 @@ class Analyzer:
     def get_state(self, tid):
         return self.state.get(int(tid), self.S_UNSEEN)
 
-<<<<<<< HEAD
-=======
 
 # ─────────────────────────────────────────────────────────
 #  VIOLATION SAVER
 # ─────────────────────────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 class ViolationSaver:
     def __init__(self, output_dir=OUTPUT_DIR):
         self.out   = output_dir
@@ -683,13 +520,10 @@ class ViolationSaver:
         print(f"  [VI PHAM #{self.count}] ID={track_id}"
               f"  frame={frame_idx}  t={t_s:.1f}s")
 
-<<<<<<< HEAD
-=======
 
 # ─────────────────────────────────────────────────────────
 #  VIDEO READER (threaded)
 # ─────────────────────────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 class VideoReader(threading.Thread):
     def __init__(self, path, buf=16):
         super().__init__(daemon=True)
@@ -716,11 +550,7 @@ class VideoReader(threading.Thread):
             try:
                 self.q.put(frame, timeout=0.5)
             except queue.Full:
-<<<<<<< HEAD
                 pass
-=======
-                pass   # Drop frame neu xu ly cham qua
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         self.cap.release()
 
     def read(self, timeout=5):
@@ -732,13 +562,10 @@ class VideoReader(threading.Thread):
             try: self.q.get_nowait()
             except queue.Empty: break
 
-<<<<<<< HEAD
-=======
 
 # ─────────────────────────────────────────────────────────
 #  GUI DRAWER
 # ─────────────────────────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 class Drawer:
     _PC = (220, 80, 255)
     _VC = (0, 60, 230)
@@ -869,13 +696,10 @@ class Drawer:
         with open(CONFIG_FILE, "w") as f:
             json.dump(cfg, f, indent=2)
 
-<<<<<<< HEAD
-=======
 
 # ─────────────────────────────────────────────────────────
 #  HELPERS
 # ─────────────────────────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 def load_config():
     if os.path.exists(CONFIG_FILE):
         with open(CONFIG_FILE) as f: cfg = json.load(f)
@@ -893,10 +717,7 @@ def load_config():
     print(f"  Polygon : {len(poly)} diem | Vline: {pa} -> {pb}")
     return poly, pa, pb, ec, vc, cd
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 def nms(dets, iou_thr=0.50):
     """NMS don gian (x1y1x2y2 + conf)."""
     if len(dets) == 0:
@@ -919,10 +740,7 @@ def nms(dets, iou_thr=0.50):
         order = rest[iou <= iou_thr]
     return dets[keep]
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 def build_zone_overlay(shape, poly, pa, pb):
     ov  = np.zeros(shape, dtype=np.uint8)
     pts = np.array([(int(p[0]),int(p[1])) for p in poly], np.int32)
@@ -938,13 +756,10 @@ def build_zone_overlay(shape, poly, pa, pb):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.55, (80,160,255), 2)
     return ov
 
-<<<<<<< HEAD
-=======
 
 # ─────────────────────────────────────────────────────────
 #  MAIN PIPELINE
 # ─────────────────────────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 def run_detection(show=False):
     from ultralytics import YOLO
 
@@ -962,26 +777,16 @@ def run_detection(show=False):
     print(f"[VIDEO] {VIDEO_PATH}  {W}x{H}  {fps:.1f}fps  {total} frames")
     reader.start()
 
-<<<<<<< HEAD
-=======
     # YOLO
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
     model = YOLO(YOLO_MODEL)
 
     infer_h = int(INFER_W * H / W)
     scale_x = W / INFER_W
     scale_y = H / infer_h
 
-<<<<<<< HEAD
     import torch
     _dummy = np.zeros((infer_h, INFER_W, 3), dtype=np.uint8)
     model(_dummy, verbose=False)
-=======
-    # Warmup 1 frame de YOLO fuse layers xong, sau do thu half precision
-    import torch
-    _dummy = np.zeros((infer_h, INFER_W, 3), dtype=np.uint8)
-    model(_dummy, verbose=False)   # fuse + warmup
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
     use_half = False
     if torch.cuda.is_available():
         try:
@@ -993,27 +798,17 @@ def run_detection(show=False):
     if not use_half:
         print("[MODEL] FP32 (CPU hoac GPU khong ho tro FP16)")
 
-<<<<<<< HEAD
-=======
     # SORT tracker (tu tich hop, khong phu thuoc supervision)
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
     tracker  = SORTTracker()
     analyzer = Analyzer(poly, pa_t, pb_t, ec, vc, cd)
     saver    = ViolationSaver()
 
     S = Analyzer
     COLOR = {
-<<<<<<< HEAD
         S.S_ENTERING: (0,   200, 200),
         S.S_TRACKING: (0,   200,  50),
         S.S_VIOLATED: (0,    40, 220),
         S.S_GHOST:    (150, 150,   0),
-=======
-        S.S_ENTERING: (0,   200, 200),   # cyan
-        S.S_TRACKING: (0,   200,  50),   # xanh la
-        S.S_VIOLATED: (0,    40, 220),   # do
-        S.S_GHOST:    (150, 150,   0),   # vang nhat (ghost)
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
     }
     LABEL = {
         S.S_ENTERING: "ENTER",
@@ -1023,11 +818,7 @@ def run_detection(show=False):
     }
 
     if show:
-<<<<<<< HEAD
         win = "Wrong Lane Detector"
-=======
-        win = "Wrong Lane Detector v6"
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
         cv2.namedWindow(win, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(win, min(W, 1280), min(H, 720))
         zone_ov = build_zone_overlay((H, W, 3), poly, pa_t, pb_t)
@@ -1047,17 +838,9 @@ def run_detection(show=False):
             if frame is None:
                 break
 
-<<<<<<< HEAD
             small   = cv2.resize(frame, (INFER_W, infer_h))
             results = model(small, verbose=False)[0]
 
-=======
-            # ── Inference (TOAN BO moi frame, khong skip) ──
-            small   = cv2.resize(frame, (INFER_W, infer_h))
-            results = model(small, verbose=False)[0]
-
-            # [P2-FIX] Filter class thu cong (tranh xung dot index model khac nhau)
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
             raw_dets = []
             if results.boxes is not None and len(results.boxes) > 0:
                 boxes = results.boxes
@@ -1067,11 +850,7 @@ def run_detection(show=False):
                     if cls_id not in VEHICLE_CLASSES: continue
                     if conf < CONF_THRESH: continue
                     x1r, y1r, x2r, y2r = boxes.xyxy[j].tolist()
-<<<<<<< HEAD
-
-=======
                     # Scale ve toa do goc
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
                     x1o = x1r * scale_x; y1o = y1r * scale_y
                     x2o = x2r * scale_x; y2o = y2r * scale_y
                     raw_dets.append([x1o, y1o, x2o, y2o, conf])
@@ -1079,24 +858,12 @@ def run_detection(show=False):
             dets_np = np.array(raw_dets, dtype=np.float32) \
                       if raw_dets else np.empty((0, 5), dtype=np.float32)
 
-<<<<<<< HEAD
             dets_np = nms(dets_np, iou_thr=IOU_THRESH)
 
             tracks = tracker.update(dets_np)
 
             active_ids = []
             draw_ids   = {}
-=======
-            # NMS thu cong
-            dets_np = nms(dets_np, iou_thr=IOU_THRESH)
-
-            # ── SORT tracking ──────────────────────────────
-            tracks = tracker.update(dets_np)
-            # tracks: (M,5) [x1,y1,x2,y2,tid]  hoac (0,5)
-
-            active_ids = []
-            draw_ids   = {}   # tid -> (bbox, state)
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 
             for row in tracks:
                 x1, y1, x2, y2, tid_f = row
@@ -1112,10 +879,7 @@ def run_detection(show=False):
                 elif result == 'tracking':
                     draw_ids[tid] = (draw_bbox, analyzer.get_state(tid))
 
-<<<<<<< HEAD
-=======
             # [P1-FIX] Xu ly ghost: ID con trong analyzer nhung khong con trong tracks
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
             analyzer.cleanup(active_ids)
             for tid in list(analyzer.state.keys()):
                 if tid not in active_ids and tid not in draw_ids:
@@ -1124,17 +888,9 @@ def run_detection(show=False):
                         if ghost_bbox is not None:
                             draw_ids[tid] = (ghost_bbox, S.S_GHOST)
 
-<<<<<<< HEAD
             if show:
                 vis = cv2.addWeighted(frame, 0.85, zone_ov, 0.15, 0)
 
-=======
-            # ── Visualize ──────────────────────────────────
-            if show:
-                vis = cv2.addWeighted(frame, 0.85, zone_ov, 0.15, 0)
-
-                # Ve vach vi pham
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
                 cv2.line(vis, pa_t, pb_t, (0, 40, 220), 3)
                 cv2.circle(vis, pa_t, 7, (0, 180, 255), -1)
                 cv2.circle(vis, pb_t, 7, (0,  40, 220), -1)
@@ -1146,10 +902,7 @@ def run_detection(show=False):
                     lbl   = LABEL.get(state, "")
                     thick = 3 if state == S.S_VIOLATED else 2
 
-<<<<<<< HEAD
-=======
                     # Ghost: ve bbox mo hon
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
                     if state == S.S_GHOST:
                         ghost_vis = vis.copy()
                         cv2.rectangle(ghost_vis, (x1,y1), (x2,y2), color, thick)
@@ -1157,17 +910,9 @@ def run_detection(show=False):
                     else:
                         cv2.rectangle(vis, (x1,y1), (x2,y2), color, thick)
 
-<<<<<<< HEAD
                     bc = ((x1+x2)//2, y2)
                     cv2.circle(vis, bc, 5, color, -1)
 
-=======
-                    # Diem bottom-center
-                    bc = ((x1+x2)//2, y2)
-                    cv2.circle(vis, bc, 5, color, -1)
-
-                    # Label
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
                     tag = f"ID:{tid} {lbl}" if lbl else f"ID:{tid}"
                     (tw, th), _ = cv2.getTextSize(
                         tag, cv2.FONT_HERSHEY_SIMPLEX, 0.52, 2)
@@ -1176,10 +921,7 @@ def run_detection(show=False):
                     cv2.putText(vis, tag, (lx+3, ly),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.52, color, 2)
 
-<<<<<<< HEAD
-=======
                 # HUD
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
                 n_track = sum(1 for _, s in draw_ids.values()
                               if s == S.S_TRACKING)
                 hud = (f"Frame {frame_idx}/{total}  |  "
@@ -1211,13 +953,10 @@ def run_detection(show=False):
     print(f"\n[DONE] Tong vi pham : {saver.count}")
     print(f"[DONE] Anh luu tai  : {os.path.abspath(saver.out)}/")
 
-<<<<<<< HEAD
-=======
 
 # ─────────────────────────────────────────────────────────
 #  ENTRY POINT
 # ─────────────────────────────────────────────────────────
->>>>>>> 0167611c51bcb26302b270ddfdc558e45ce4a467
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(
         description="Wrong Lane Detector "
