@@ -46,13 +46,15 @@ Hệ thống được tối ưu hóa để đảm bảo độ chính xác trong 
 ##  2. Công Nghệ sử dụng (Tech Stack Analysis)
 Chúng em lựa chọn những công nghệ tối ưu nhất để đảm bảo sự cân bằng giữa **Độ chính xác** và **Tốc độ xử lý**.
 
-| Thành Phần | Công Nghệ Lõi | Phân Tích Kỹ Thuật |
+| Thành phần | Công nghệ | Phân tích kỹ thuật |
 | :--- | :--- | :--- |
-| **Detection** | `YOLOv8m` | Model trung bình của Ultralytics giúp nhận diện tốt cả vật thể xa, nhỏ nhưng vẫn duy trì >25 FPS. |
-| **Tracking** | `SORT Framework` | Kết hợp Kalman Filter và Hungarian Algorithm để bám đuổi ID xe qua hàng ngàn Frame. |
-| **Region Logic** | `Ray-Casting` | Giải thuật toán học kiểm tra điểm nằm trong đa giác cấm với độ phức tạp $O(N)$ cực thấp. |
-| **Storage** | `OpenCV FFmpeg` | Tối ưu hóa việc nén ảnh và ghi dữ liệu đa luồng không gây đứng queue xử lý. |
-
+| **Nhận diện (Detection)** | `YOLOv8m` | Sử dụng mô hình trung bình (Medium) từ Ultralytics để cân bằng giữa độ chính xác và tốc độ. Có khả năng trích xuất đặc trưng tốt hơn bản Nano, giúp nhận diện chính xác xe máy và ô tô ở khoảng cách xa (50m-100m). |
+| **Theo vết (Tracking)** | `SORT Framework` | Sử dụng **Kalman Filter** để dự đoán vị trí và **Hungarian Algorithm** để tối ưu hóa gán ID. Giúp hệ thống không bị mất dấu hoặc nhảy ID khi phương tiện bị che khuất tạm thời. |
+| **Xử lý luồng (Concurrency)** | `Multi-threading` | Tách biệt luồng đọc video (`VideoReader`) và luồng xử lý AI qua hàng đợi `Queue`. Đảm bảo hệ thống xử lý mượt mà, không bị "giật lag" do tốc độ đọc dữ liệu chậm hơn tốc độ suy luận. |
+| **Logic vùng cấm (Spatial Logic)** | `Ray-Casting` | Triển khai qua `cv2.pointPolygonTest`. Kiểm tra điểm nằm trong đa giác với độ phức tạp $O(N)$, đảm bảo hiệu suất cực cao ngay cả khi vùng cấm có hình dạng phức tạp. |
+| **Xác định vi phạm (Geometry)** | `Vector Cross Product` | Sử dụng tích vector để kiểm tra sự giao cắt giữa quỹ đạo di chuyển và vạch vi phạm (`VLINE`). Đảm bảo độ chính xác tuyệt đối so với các phương pháp kiểm tra va chạm thông thường. |
+| **Quản lý trạng thái (State Mgmt)** | `Finite State Machine` | Hệ thống hóa vòng đời phương tiện qua các trạng thái: `S_UNSEEN` → `S_ENTERING` → `S_TRACKING` → `S_VIOLATED`. Giúp loại bỏ báo động giả thông qua cơ chế xác nhận đa khung hình. |
+| **Lưu trữ bằng chứng (Data Export)** | `Buffer & CSV` | Sử dụng bộ đệm lọc **Top 5 ảnh có Bbox lớn nhất** (độ nét cao nhất). Dữ liệu văn bản được lưu dạng CSV, tối ưu dung lượng và dễ dàng tích hợp vào các hệ thống quản lý. |
 > **NOTE**
 > Chúng em chọn phiên bản `m` (medium) thay vì `n` (nano) để bắt được chi tiết các loại xe ở khoảng cách 50m-100m, nơi mà các model nhỏ hơn thường bị nhầm lẫn giữa bóng xe và vật thể thực.
 
@@ -110,7 +112,22 @@ graph LR
     (2) Có quỹ đạo cắt ngang vạch vi phạm (Violation Line). 
   Điều này loại bỏ hoàn toàn các trường hợp xe đỗ sát vạch nhưng không vi phạm.
 
+## Quy trình xử lý hệ thống (System Pipeline)
+
+Hệ thống vận hành dựa trên một Pipeline khép kín gồm 7 giai đoạn, tối ưu hóa từ khâu nhập liệu đến xuất bằng chứng:
+
+| STT | Giai đoạn | Thành phần kỹ thuật | Chi tiết hoạt động kỹ thuật |
+| :--- | :--- | :--- | :--- |
+| **1** | **Nhập liệu** | `VideoReader Thread` | Sử dụng đa luồng (multi-threading) để đọc khung hình từ `video.mp4`. Khung hình được đẩy vào hàng đợi (`Queue`), đảm bảo luồng AI luôn có dữ liệu tức thời, loại bỏ độ trễ do tốc độ đọc ổ đĩa. |
+| **2** | **Tiền xử lý** | `Frame Resize/Blob` | Chuẩn hóa kích thước hình ảnh và hệ màu để phù hợp với đầu vào mô hình YOLOv8. Quá trình này giúp tăng tốc độ suy luận và duy trì độ chính xác đồng nhất. |
+| **3** | **Phát hiện** | **YOLOv8m Engine** | Quét vật thể và phân loại. Hệ thống chỉ lọc các Class ID thuộc nhóm phương tiện: **Ô tô (2), Xe máy (3), Xe buýt (5)**; loại bỏ nhiễu từ người đi bộ hoặc vật cản tĩnh. |
+| **4** | **Theo dõi** | **SORT Tracker** | Cấp ID định danh duy nhất cho mỗi xe. Sử dụng **Kalman Filter** để dự đoán vị trí, giúp duy trì dấu vết (tracking) liên tục ngay cả khi xe bị che khuất hoặc nhiễu ảnh tạm thời. |
+| **5** | **Phân tích** | `Analyzer Logic` | **Không gian:** Dùng `cv2.pointPolygonTest` kiểm tra xe trong `ZONE_POLYGON`.<br>**Hình học:** Kiểm tra vector di chuyển của xe có cắt qua vạch vi phạm (`VLINE`) hay không. |
+| **6** | **Xác thực** | `Confirm Frames` | Sử dụng bộ đệm xác thực kép:<br>- `ENTER_CONFIRM`: Xác nhận xe ở trong vùng cấm đủ $n$ khung hình.<br>- `LOST_TTL`: Đợi 30 khung hình sau khi mất dấu để chốt hạ hành trình vi phạm. |
+| **7** | **Lưu trữ** | `ViolationSaver` | Truy xuất **Top 5 ảnh nét nhất** (diện tích Bbox lớn nhất) từ bộ đệm. Tự động xuất file ảnh `.jpg` chất lượng cao và ghi nhật ký vi phạm vào tệp `violations.csv`. |
+
 ---
+
 ## 4. Quy trình hoạt động thực tế
 
 Hệ thống vận hành dựa trên sự kết hợp giữa thị giác máy tính (Computer Vision) và các thuật toán hình học để xác định hành vi vi phạm một cách chính xác nhất.
