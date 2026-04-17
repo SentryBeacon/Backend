@@ -31,6 +31,21 @@ Trong bối cảnh hạ tầng giao thông đô thị ngày càng phức tạp, 
 - **Chính xác**: Chụp và lưu trữ hình ảnh hiện trường cùng ID định danh duy nhất.
 - **Độ tin cậy**: Sử dụng Kalman Filter để "nhìn xuyên" qua các khoảnh khắc mất dấu tạm thời.
 
+### Thông số kỹ thuật (Technical Specifications)
+Hệ thống được tối ưu hóa để đảm bảo độ chính xác trong nhận diện và duy trì hiệu suất xử lý thời gian thực.
+
+| Thành phần | Công nghệ / Giá trị |
+| :--- | :--- |
+| **Mô hình AI** | **YOLOv8m (Medium)** — Cân bằng tối ưu giữa độ chính xác và tốc độ xử lý. |
+| **Thuật toán theo vết** | **SORT** (Kalman Filter & Hungarian Algorithm) giúp duy trì ID thực thể liên tục. |
+| **Xử lý luồng** | **Multi-threading** với lớp `VideoReader` riêng biệt, giảm thiểu độ trễ đọc khung hình. |
+| **Đối tượng nhận diện** | Ô tô (Car), Xe máy (Moto), Xe buýt (Bus). |
+| **Dữ liệu đầu ra** | Ảnh hiện trường (Scene), Ảnh cận cảnh (Crop), Nhật ký vi phạm (CSV). |
+
+###  Đặc điểm nổi bật
+* **Kiến trúc linh hoạt:** Hỗ trợ cả chế độ xử lý có giao diện (`--show`) và chế độ chạy ngầm tối ưu hiệu suất.
+* **Độ tin cậy cao:** Sử dụng cơ chế xác nhận đa khung hình (`ENTER_CONFIRM_FRAMES`) để loại bỏ các trường hợp nhận diện sai do nhiễu.
+* **Lưu trữ thông minh:** Tự động trích xuất khung hình sắc nét nhất (Best Frame) của phương tiện dựa trên diện tích vùng bao (Bbox area).
 ---
 
 ##  2. Công Nghệ sử dụng (Tech Stack Analysis)
