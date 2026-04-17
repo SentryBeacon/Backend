@@ -164,16 +164,15 @@ việc lưu bằng chứng không xảy ra ngay lập tức tại thời điểm
 - **Lưu trữ tạm thời**: Hệ thống duy trì một danh sách best_frames cho mỗi ID xe.
 - **Xếp hạng độ nét**: Với mỗi khung hình mới, hệ thống tính diện tích của Bbox (area = (x2 - x1) * (y2 - y1)).
 - **Quy luật vật lý**: Thông thường, xe càng đi về phía cuối (gần camera hơn) thì kích thước vùng bao càng lớn, dẫn đến độ phân giải ảnh của xe đó càng cao và nét hơn.
->> **Chọn lọc**: Code của bạn chỉ giữ lại TOP 5 khung hình có diện tích lớn nhất.
+ **Chọn lọc**: Code của bạn chỉ giữ lại TOP 5 khung hình có diện tích lớn nhất.
 ### d. Quy trình trích xuất bằng chứng
 
 Khi xe đã đi đến cuối và ID bị xóa khỏi bộ nhớ theo dõi:
- 1.Hệ thống lục lại danh sách best_frames đã lưu trước đó.
- 2.Lấy khung hình đứng đầu danh sách (có diện tích lớn nhất) để lưu thành file _best.jpg.
- 3. Lưu kèm theo ảnh tại đúng thời điểm vi phạm (_scene.jpg) để làm bằng chứng pháp lý về vị trí.
+ - Hệ thống lục lại danh sách best_frames đã lưu trước đó.
+ - Lấy khung hình đứng đầu danh sách (có diện tích lớn nhất) để lưu thành file _best.jpg.
+ - Lưu kèm theo ảnh tại đúng thời điểm vi phạm (_scene.jpg) để làm bằng chứng pháp lý về vị trí.
 
 > Kết luận: Xe đi đến cuối mới "chốt" vi phạm để đảm bảo thu thập được toàn bộ quá trình di chuyển, đồng thời lúc này hệ thống đã có trong tay "kho dữ liệu" về các hình ảnh của xe đó trong quá khứ để chọn ra tấm ảnh đẹp nhất. Điều này giúp tránh việc lưu ảnh lúc xe còn ở quá xa, bị mờ hoặc nhỏ.
-> 
 ---
 
 ## 7. Demo Thực Nghiệm (Evidence Case Studies)
