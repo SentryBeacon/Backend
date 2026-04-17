@@ -99,7 +99,10 @@ graph LR
 
 > [!IMPORTANT]
 > **State Machine Logic:** 
-> Hệ thống chỉ kích hoạt vi phạm khi đối tượng thỏa mãn đồng thời: (1) Nằm trong vùng đa giác cấm và (2) Có quỹ đạo cắt ngang vạch vi phạm (Violation Line). Điều này loại bỏ hoàn toàn các trường hợp xe đỗ sát vạch nhưng không vi phạm.
+> Hệ thống chỉ kích hoạt vi phạm khi đối tượng thỏa mãn đồng thời: 
+    (1) Nằm trong vùng cấm
+    (2) Có quỹ đạo cắt ngang vạch vi phạm (Violation Line). 
+  Điều này loại bỏ hoàn toàn các trường hợp xe đỗ sát vạch nhưng không vi phạm.
 
 ---
 
