@@ -3,10 +3,7 @@
 <div align="center">
   <img src="images/vp_0002_id6_20260416_233801_457_scene.jpg" alt="SeantryBeacon Hero" width="850" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"/>
   <br><br>
-  
-  [![Tech Stack](https://img.shields.io/badge/Tech%20Stack-Python%20%7C%20YOLOv8%20%7C%20OpenCV-blue.svg)](#)
-  [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)](#)
-  [![License](https://img.shields.io/badge/License-MIT-orange.svg)](#)
+
   
   **Giải pháp Thị giác Máy tính Tối ưu cho Giám sát Giao thông và Trích xuất Bằng chứng Hình ảnh Tự động.**
 </div>
